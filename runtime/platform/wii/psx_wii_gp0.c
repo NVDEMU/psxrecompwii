@@ -42,7 +42,9 @@ static uint16_t rgb888_to_rgb555(uint32_t word)
 
 static int packet_length(uint32_t word)
 {
-    const unsigned int op = (word >> 24) & 0xfcu;
+    const unsigned int raw_op = (word >> 24) & 0xffu;
+    const unsigned int op =
+        (raw_op >= 0x20u && raw_op <= 0x7fu) ? (raw_op & 0xfcu) : raw_op;
 
     switch (op) {
     case 0x00: /* NOP */
@@ -92,7 +94,9 @@ static void set_draw_area_bottom_right(uint32_t word)
 
 static void execute_packet(void)
 {
-    const unsigned int op = (s_packet[0] >> 24) & 0xfcu;
+    const unsigned int raw_op = (s_packet[0] >> 24) & 0xffu;
+    const unsigned int op =
+        (raw_op >= 0x20u && raw_op <= 0x7fu) ? (raw_op & 0xfcu) : raw_op;
     const uint16_t color = rgb888_to_rgb555(s_packet[0]);
     int x, y, w, h;
 
@@ -216,6 +220,10 @@ void psx_wii_gp0_reset(void)
     s_collected = 0;
     s_required = 0;
     memset(s_packet, 0, sizeof(s_packet));
+    s_area_x1 = 0;
+    s_area_y1 = 0;
+    s_area_x2 = PSX_WII_VRAM_WIDTH - 1;
+    s_area_y2 = PSX_WII_VRAM_HEIGHT - 1;
     if (s_vram != NULL) {
         sw_set_draw_area(0, 0, PSX_WII_VRAM_WIDTH - 1,
                          PSX_WII_VRAM_HEIGHT - 1);
