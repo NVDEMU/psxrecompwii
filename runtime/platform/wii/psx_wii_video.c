@@ -8,12 +8,15 @@
 #define PSX_WII_TEX_WIDTH  1024u
 #define PSX_WII_TEX_HEIGHT 576u
 #define PSX_WII_TEX_BYTES  (PSX_WII_TEX_WIDTH * PSX_WII_TEX_HEIGHT * 2u)
+/* GX requires a real, 32-byte-aligned command FIFO. */
+#define PSX_WII_FIFO_BYTES (256u * 1024u)
 
 static GXRModeObj *s_mode;
 static void *s_xfb[2];
 static unsigned int s_next_xfb;
 static uint16_t *s_texture_pixels;
 static GXTexObj s_texture;
+static void *s_gx_fifo;
 static int s_initialized;
 
 static uint16_t argb_to_rgb565(uint32_t pixel)
@@ -110,7 +113,13 @@ int psx_wii_video_init(void)
         VIDEO_WaitVSync();
     }
 
-    GX_Init(NULL, 0);
+    s_gx_fifo = memalign(32, PSX_WII_FIFO_BYTES);
+    if (s_gx_fifo == NULL) {
+        psx_wii_video_shutdown();
+        return -1;
+    }
+    memset(s_gx_fifo, 0, PSX_WII_FIFO_BYTES);
+    GX_Init(s_gx_fifo, PSX_WII_FIFO_BYTES);
     GX_SetCopyClear(black, 0x00ffffff);
     GX_SetViewport(0.0f, 0.0f, (f32)s_mode->fbWidth,
                    (f32)s_mode->efbHeight, 0.0f, 1.0f);
@@ -200,6 +209,14 @@ int psx_wii_video_present_argb(const uint32_t *pixels,
 void psx_wii_video_shutdown(void)
 {
     unsigned int i;
+    if (s_initialized) {
+        /* Do not release GX's command buffer while the GPU may still read it. */
+        GX_DrawDone();
+    }
+    if (s_gx_fifo != NULL) {
+        free(s_gx_fifo);
+        s_gx_fifo = NULL;
+    }
     if (s_texture_pixels != NULL) {
         free(s_texture_pixels);
         s_texture_pixels = NULL;
