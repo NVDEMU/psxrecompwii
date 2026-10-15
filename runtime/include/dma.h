@@ -87,8 +87,13 @@ typedef struct DMATraceEntry {
     uint32_t pc;
 } DMATraceEntry;
 
+#ifdef PSX_NO_DEBUG_TOOLS
+#define DMA_TRACE_CAP (1 << 8)
+#define DMA_CDROM_HISTORY_CAP (1 << 6)
+#else
 #define DMA_TRACE_CAP (1 << 14)
 #define DMA_CDROM_HISTORY_CAP (1 << 13)
+#endif
 #define DMA_CDROM_HISTORY_WORDS 16
 
 typedef struct DMACDROMHistoryEntry {
@@ -171,7 +176,11 @@ void dma_debug_clear_cdrom_history(void);
 /* Always-on record of every CPU hold for a kicked GPU linked-list walk
  * (the kicking store returns only when the walk ends). Ring is the newest
  * DMA_GPU_HOLD_RING_CAP holds; stats are cumulative since boot. */
+#ifdef PSX_NO_DEBUG_TOOLS
+#define DMA_GPU_HOLD_RING_CAP 256u
+#else
 #define DMA_GPU_HOLD_RING_CAP 4096u
+#endif
 typedef struct {
     uint64_t seq;
     uint64_t cycle;         /* guest cycle at the kick */
