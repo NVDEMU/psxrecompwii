@@ -129,6 +129,7 @@ int psx_wii_video_init(void)
     GX_SetAlphaUpdate(GX_FALSE);
     GX_SetNumChans(1);
     GX_SetNumTexGens(1);
+    GX_SetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
     GX_SetNumTevStages(1);
     GX_SetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_VTX, GX_SRC_VTX, 0,
                    GX_DF_NONE, GX_AF_NONE);
