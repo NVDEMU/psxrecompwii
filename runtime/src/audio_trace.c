@@ -18,7 +18,11 @@
 #define PCM_RING_MASK   (PCM_RING_FRAMES - 1u)
 #endif
 
+#ifdef PSX_NO_DEBUG_TOOLS
+#define EV_RING_CAP  (1u << 8)
+#else
 #define EV_RING_CAP  (1u << 19)
+#endif
 #define EV_RING_MASK (EV_RING_CAP - 1u)
 
 /* Audibility threshold shared with snesrecomp's dropped_audible metric:
