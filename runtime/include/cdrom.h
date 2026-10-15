@@ -275,9 +275,15 @@ typedef struct CDROMTraceEntry {
     int read_delay;
 } CDROMTraceEntry;
 
+#ifdef PSX_NO_DEBUG_TOOLS
+#define CDROM_TRACE_CAP (1 << 8)
+#define CDROM_COMMAND_HISTORY_CAP (1 << 6)
+#define CDROM_SECTOR_HISTORY_CAP (1 << 6)
+#else
 #define CDROM_TRACE_CAP (1 << 16)
 #define CDROM_COMMAND_HISTORY_CAP (1 << 13)
 #define CDROM_SECTOR_HISTORY_CAP (1 << 13)
+#endif
 #define CDROM_SECTOR_HISTORY_BYTES 128
 
 typedef struct CDROMCommandHistoryEntry {
