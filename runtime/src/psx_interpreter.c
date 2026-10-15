@@ -59,7 +59,11 @@ static uint32_t s_bp[MAX_BREAKPOINTS];
 static int      s_bp_count;
 
 /* Trace ring */
+#ifdef PSX_NO_DEBUG_TOOLS
+#define TRACE_RING_SIZE (1u << 8)    /* bounded trace storage for Wii release */
+#else
 #define TRACE_RING_SIZE (1u << 20)  /* 1M entries */
+#endif
 #define TRACE_RING_MASK (TRACE_RING_SIZE - 1)
 static InterpTraceEntry s_trace_ring[TRACE_RING_SIZE];
 static uint64_t s_trace_seq;
