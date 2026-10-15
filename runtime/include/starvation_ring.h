@@ -27,7 +27,11 @@ extern "C" {
 #  endif
 #endif
 
+#ifdef PSX_NO_DEBUG_TOOLS
+#define STARVATION_RING_CAP (1 << 8)
+#else
 #define STARVATION_RING_CAP (1 << 14)  /* 16K entries */
+#endif
 
 typedef enum {
     SR_EVT_NONE          = 0,
