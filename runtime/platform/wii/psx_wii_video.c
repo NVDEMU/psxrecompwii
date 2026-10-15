@@ -10,6 +10,8 @@
 #define PSX_WII_TEX_BYTES  (PSX_WII_TEX_WIDTH * PSX_WII_TEX_HEIGHT * 2u)
 /* GX requires a real, 32-byte-aligned command FIFO. */
 #define PSX_WII_FIFO_BYTES (256u * 1024u)
+/* GX requires a real, 32-byte-aligned command FIFO. */
+#define PSX_WII_FIFO_BYTES (256u * 1024u)
 
 static GXRModeObj *s_mode;
 static void *s_xfb[2];
