@@ -1,0 +1,43 @@
+name: Wii platform smoke build
+
+on:
+  push:
+    branches: [master, wii-port]
+    paths:
+      - "runtime/platform/wii/**"
+      - ".github/workflows/wii-platform-smoke.yml"
+  pull_request:
+    paths:
+      - "runtime/platform/wii/**"
+      - ".github/workflows/wii-platform-smoke.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-wii-input-smoke:
+    name: Build Wii controller bridge DOL
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build with devkitPPC
+        run: |
+          docker run --rm \
+            -v "${GITHUB_WORKSPACE}:/work" \
+            -w /work/runtime/platform/wii/smoke \
+            devkitpro/devkitppc:latest \
+            bash -lc 'make clean && make'
+
+      - name: Verify Wii DOL
+        run: |
+          test -s runtime/platform/wii/smoke/psx-wii-input-smoke.dol
+          file runtime/platform/wii/smoke/psx-wii-input-smoke.dol
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: psxrecomp-wii-input-smoke-dol
+          path: runtime/platform/wii/smoke/psx-wii-input-smoke.dol
+          if-no-files-found: error
+          retention-days: 14
